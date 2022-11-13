@@ -18,8 +18,8 @@ import java.net.Socket;
  */
 public class TicTacToeClient {
 
-    private String[] board = new String[9];
-
+    private static String[] board = { "0", "1", "2", "3", "4", "5", "6", "7", "8" };
+    private int myNum;
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
@@ -51,6 +51,8 @@ public class TicTacToeClient {
             while (true) {
                 response = in.readUTF();
                 if (response.startsWith("VALID_MOVE")) {
+                    board[myNum] = Character.toString(mark);
+                    printGrid();
                     System.out.println("Valid move, please wait");
                 } else if (response.startsWith("OPPONENT_MOVED_END")) {
                     var loc = Integer.parseInt(response.substring(19));
@@ -59,11 +61,13 @@ public class TicTacToeClient {
                 } else if (response.startsWith("OPPONENT_MOVED")) {
                     var loc = Integer.parseInt(response.substring(15));
                     board[loc] = Character.toString(opponentMark);
+                    printGrid();
                     System.out.println("Opponent moved " + loc + ", your turn");
                     System.out.print("MOVE ");
                     String num = br.readLine();
                     try {
                         out.writeUTF("MOVE " + num);
+                        myNum = Integer.parseInt(num);
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
@@ -75,6 +79,7 @@ public class TicTacToeClient {
                     String num = br.readLine();
                     try {
                         out.writeUTF("MOVE " + num);
+                        myNum = Integer.parseInt(num);
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
@@ -91,23 +96,37 @@ public class TicTacToeClient {
                     System.out.println("Other player left");
                     break;
                 }
+
             }
             System.out.println("QUIT");
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             socket.close();
-            //frame.dispose();
+            // frame.dispose();
         }
+    }
+
+    private static void printGrid() {
+
+        System.out.println("UPDATED BOARD:\n");
+        System.out.println(board[0] + " | " + board[1] + " | " + board[2]);
+        System.out.println("\n----------");
+        System.out.println(board[3] + " | " + board[4] + " | " + board[5]);
+        System.out.println("\n----------");
+        System.out.println(board[6] + " | " + board[7] + " | " + board[8]);
+        System.out.println("\n\n");
     }
 
     public static void main(String[] args) throws Exception {
         /*
-        if (args.length != 1) {
-            System.err.println("Pass the server IP as the sole command line argument");
-            return;
-        } */
+         * if (args.length != 1) {
+         * System.err.println("Pass the server IP as the sole command line argument");
+         * return;
+         * }
+         */
         TicTacToeClient client = new TicTacToeClient("localhost");
+        printGrid();
         client.play();
     }
 }
