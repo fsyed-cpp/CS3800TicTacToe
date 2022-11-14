@@ -17,8 +17,8 @@ import java.net.Socket;
  */
 public class TicTacToeClient {
 
-    private static String[] board = { "0", "1", "2", "3", "4", "5", "6", "7", "8" };
-    private int myNum;
+    private static String[] board = { "0", "1", "2", "3", "4", "5", "6", "7", "8" }; //initializing board
+    private int myNum; //to keep track of previous move. Updates board in correct item in the array when a valid move is given by the player.
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
@@ -32,15 +32,10 @@ public class TicTacToeClient {
         br = new BufferedReader(new InputStreamReader(System.in));
     }
 
-    /**
-     * The main thread of the client will listen for messages from the server. The
-     * first message will be a "WELCOME" message in which we receive our mark. Then
-     * we go into a loop listening for any of the other messages, and handling each
-     * message appropriately. The "VICTORY", "DEFEAT", "TIE", and
-     * "OTHER_PLAYER_LEFT" messages will ask the user whether or not to play another
-     * game. If the answer is no, the loop is exited and the server is sent a "QUIT"
-     * message.
-     */
+    
+    
+    //Client will listen for server messages. Specific keywords include WELCOME, VICTORY, DEFEAT, OTHER_PLAYER_LEFT
+    //this messages will trigger specific actions for the client side when received from the server.
     public void play() throws Exception {
         try {
             String response = in.readUTF();
@@ -49,14 +44,14 @@ public class TicTacToeClient {
             var opponentMark = mark == 'X' ? 'O' : 'X';
             while (true) {
                 response = in.readUTF();
-                if (response.startsWith("VALID_MOVE")) {
-                    board[myNum] = Character.toString(mark);
-                    printGrid();
+                if (response.startsWith("VALID_MOVE")) { //if valid move
+                    board[myNum] = Character.toString(mark); //updated board with correct mark
+                    printGrid(); //show grid to client
                     System.out.println("Valid move, please wait");
                 } else if (response.startsWith("OPPONENT_MOVED_END")) {
                     var loc = Integer.parseInt(response.substring(19));
-                    board[loc] = Character.toString(opponentMark);
-                    printGrid();
+                    board[loc] = Character.toString(opponentMark); //update board with opponent's mark
+                    printGrid(); //show grid to client when opponent makes a move.
                     System.out.println("Opponent moved " + loc);
                 } else if (response.startsWith("OPPONENT_MOVED")) {
                     var loc = Integer.parseInt(response.substring(15));
@@ -64,7 +59,7 @@ public class TicTacToeClient {
                     printGrid();
                     System.out.println("Opponent moved " + loc + ", your turn");
                     String num = "";
-                    boolean isValid = false;
+                    boolean isValid = false; //for input validation
                     do {
                         try {
                             System.out.print("MOVE ");
@@ -75,7 +70,7 @@ public class TicTacToeClient {
                             System.out.println("Invalid move");
                         }
                         if (myNum < 0 || myNum > 8) {
-                            System.out.println("Invalid move," + num + " is not within 0-8");
+                            System.out.println("Invalid move," + num + " is not within 0-8"); //show error. User needs to try again.
                         }
                     } while ((myNum < 0 || myNum > 8) || isValid == false);
                     out.writeUTF("MOVE " + num);
@@ -87,11 +82,11 @@ public class TicTacToeClient {
                     boolean isValid = false;
                     do {
                         try {
-                            System.out.print("MOVE ");
+                            System.out.print("MOVE "); //asking for user input
                             num = br.readLine();
                             myNum = Integer.parseInt(num);
                             isValid = true;
-                        } catch (Exception e1) {
+                        } catch (Exception e1) { //input validation
                             System.out.println("Invalid move");
                         }
                         if (myNum < 0 || myNum > 8) {
@@ -114,16 +109,16 @@ public class TicTacToeClient {
                 }
 
             }
-            System.out.println("QUIT");
+            System.out.println("QUIT"); //show game is over. 
         } catch (Exception e) {
             System.out.println("Disconnected from Tic Tac Toe Server");
         } finally {
-            socket.close();
+            socket.close(); //disconnect from server.
             // frame.dispose();
         }
     }
 
-    private static void printGrid() {
+    private static void printGrid() { //printing grid
 
         System.out.println("UPDATED BOARD:\n");
         System.out.println(board[0] + " | " + board[1] + " | " + board[2]);
@@ -143,10 +138,10 @@ public class TicTacToeClient {
          */
         try {
             TicTacToeClient client = new TicTacToeClient("localhost");
-            printGrid();
-            client.play();
+            printGrid(); //show empty grid
+            client.play(); //initialize game
         } catch (Exception e) {
-            System.out.println("Unable to connect to Tic Tac Toe Server");
+            System.out.println("Unable to connect to Tic Tac Toe Server"); //catch error of not being able to connect.
         }
     }
 }
