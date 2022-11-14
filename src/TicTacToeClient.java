@@ -1,7 +1,6 @@
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
@@ -57,32 +56,45 @@ public class TicTacToeClient {
                 } else if (response.startsWith("OPPONENT_MOVED_END")) {
                     var loc = Integer.parseInt(response.substring(19));
                     board[loc] = Character.toString(opponentMark);
+                    printGrid();
                     System.out.println("Opponent moved " + loc);
                 } else if (response.startsWith("OPPONENT_MOVED")) {
                     var loc = Integer.parseInt(response.substring(15));
                     board[loc] = Character.toString(opponentMark);
                     printGrid();
                     System.out.println("Opponent moved " + loc + ", your turn");
-                    System.out.print("MOVE ");
-                    String num = br.readLine();
-                    try {
-                        out.writeUTF("MOVE " + num);
-                        myNum = Integer.parseInt(num);
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
+                    String num = "";
+                    do {
+                        try {
+                            System.out.print("MOVE ");
+                            num = br.readLine();
+                            myNum = Integer.parseInt(num);
+                        } catch (Exception e1) {
+                            System.out.println("Invalid move");
+                        }
+                        if (myNum < 0 || myNum > 8) {
+                            System.out.println("Invalid move," + num + " is not within 0-8");
+                        }
+                    } while (myNum < 0 || myNum > 8);
+                    out.writeUTF("MOVE " + num);
                 } else if (response.startsWith("WAITING")) {
                     System.out.println(response.substring(8));
                 } else if (response.startsWith("MESSAGE")) {
                     System.out.println(response.substring(8));
-                    System.out.print("MOVE ");
-                    String num = br.readLine();
-                    try {
-                        out.writeUTF("MOVE " + num);
-                        myNum = Integer.parseInt(num);
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
+                    String num = "";
+                    do {
+                        try {
+                            System.out.print("MOVE ");
+                            num = br.readLine();
+                            myNum = Integer.parseInt(num);
+                        } catch (Exception e1) {
+                            System.out.println("Invalid move");
+                        }
+                        if (myNum < 0 || myNum > 8) {
+                            System.out.println("Invalid move," + num + " is not within 0-8");
+                        }
+                    } while (myNum < 0 || myNum > 8);
+                    out.writeUTF("MOVE " + num);
                 } else if (response.startsWith("VICTORY")) {
                     System.out.println("Winner Winner");
                     break;
@@ -100,7 +112,7 @@ public class TicTacToeClient {
             }
             System.out.println("QUIT");
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Disconnected from Tic Tac Toe Server");
         } finally {
             socket.close();
             // frame.dispose();
@@ -125,8 +137,12 @@ public class TicTacToeClient {
          * return;
          * }
          */
-        TicTacToeClient client = new TicTacToeClient("localhost");
-        printGrid();
-        client.play();
+        try {
+            TicTacToeClient client = new TicTacToeClient("localhost");
+            printGrid();
+            client.play();
+        } catch (Exception e) {
+            System.out.println("Unable to connect to Tic Tac Toe Server");
+        }
     }
 }

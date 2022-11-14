@@ -89,14 +89,13 @@ class Game {
                 setup();
                 processCommands();
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println("Player " + mark + " has disconnected");
             } finally {
                 if (opponent != null && opponent.output != null) {
                     try {
                         opponent.output.writeUTF("OTHER_PLAYER_LEFT");
                         opponent.output.flush();
                     } catch (IOException e) {
-                        e.printStackTrace();
                     }
                 }
                 try {
@@ -109,6 +108,7 @@ class Game {
         private void setup() throws IOException {
             input = new DataInputStream(socket.getInputStream());
             output = new DataOutputStream(socket.getOutputStream());
+            System.out.println("Player " + mark + " has connected");
             output.writeUTF("WELCOME " + mark);
             output.flush();
             if (mark == 'X') {
@@ -149,6 +149,8 @@ class Game {
                 } else if (boardFilledUp()) {
                     output.writeUTF("TIE");
                     output.flush();
+                    opponent.output.writeUTF("OPPONENT_MOVED_END " + location);
+                    opponent.output.flush();
                     opponent.output.writeUTF("TIE");
                     opponent.output.flush();
                 }
