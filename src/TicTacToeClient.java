@@ -64,36 +64,40 @@ public class TicTacToeClient {
                     printGrid();
                     System.out.println("Opponent moved " + loc + ", your turn");
                     String num = "";
+                    boolean isValid = false;
                     do {
                         try {
                             System.out.print("MOVE ");
                             num = br.readLine();
                             myNum = Integer.parseInt(num);
+                            isValid = true; // Sets to true if num is integer, otherwise, go to 'catch' block
                         } catch (Exception e1) {
                             System.out.println("Invalid move");
                         }
                         if (myNum < 0 || myNum > 8) {
                             System.out.println("Invalid move," + num + " is not within 0-8");
                         }
-                    } while (myNum < 0 || myNum > 8);
+                    } while ((myNum < 0 || myNum > 8) || isValid == false);
                     out.writeUTF("MOVE " + num);
                 } else if (response.startsWith("WAITING")) {
                     System.out.println(response.substring(8));
                 } else if (response.startsWith("MESSAGE")) {
                     System.out.println(response.substring(8));
                     String num = "";
+                    boolean isValid = false;
                     do {
                         try {
                             System.out.print("MOVE ");
                             num = br.readLine();
                             myNum = Integer.parseInt(num);
+                            isValid = true;
                         } catch (Exception e1) {
                             System.out.println("Invalid move");
                         }
                         if (myNum < 0 || myNum > 8) {
                             System.out.println("Invalid move," + num + " is not within 0-8");
                         }
-                    } while (myNum < 0 || myNum > 8);
+                    } while ((myNum < 0 || myNum > 8) || isValid == false);
                     out.writeUTF("MOVE " + num);
                 } else if (response.startsWith("VICTORY")) {
                     System.out.println("Winner Winner");
